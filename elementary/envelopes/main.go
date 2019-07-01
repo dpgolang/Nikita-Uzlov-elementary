@@ -28,11 +28,11 @@ func (e Envelope) fitIn(e2 Envelope) bool {
 	}
 }
 
-func getFloatSide(side, env int) float64 {
+func getFloatSide(side, envelopeNum int) float64 {
 
 	for {
 		scanner := bufio.NewScanner(os.Stdin)
-		fmt.Printf("\nEnter size of side_%d for envelope_%d : ", side+1, env)
+		fmt.Printf("\nEnter size of side_%d for envelope_%d : ", side+1, envelopeNum)
 		scanner.Scan()
 		str := scanner.Text()
 		if arg, err := strconv.ParseFloat(str, 64); err == nil {
