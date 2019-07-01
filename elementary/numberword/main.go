@@ -100,11 +100,14 @@ func getNumber() (int, error) {
 		scanner.Scan()
 		str := scanner.Text()
 		str = strings.Join(strings.Fields(str), "")
-		if num, err := strconv.Atoi(str); err == nil {
-			return num, err
-		} else {
+		num, err := strconv.Atoi(str);
+		if err != nil {
 			fmt.Println("Not correct input. Required one integer number.")
 		}
+		if num >= 1000000000 {
+			fmt.Println("Absolute value of number have to be less then billion.")
+		}
+		return num, err
 	}
 }
 
