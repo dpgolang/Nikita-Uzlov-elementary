@@ -33,63 +33,56 @@ func validArgs(inputs []string) (args [2]int, err error) {
 
 	args[0], err = strconv.Atoi(inputs[0])
 	if err != nil {
-		err = fmt.Errorf("\nFirst argument \"%v\" is not an integer number. \n%s\n", inputs[0], err)
-		return
+		err = fmt.Errorf("\nFirst argument \"%v\" is not an integer number.\n", inputs[0])
+		return [2]int{0, 0}, err
 	}
 
 	args[1], err = strconv.Atoi(inputs[1])
 	if err != nil {
-		err = fmt.Errorf("\nSecond argument \"%v\" is not an integer number. \n%s\n", inputs[1], err)
-		return
+		err = fmt.Errorf("\nSecond argument \"%v\" is not an integer number.\n", inputs[1])
+		return [2]int{0, 0}, err
 	}
 
 	if args[0] < 0 || args[1] < 0 {
 		err = fmt.Errorf("\nArguments have to be positive.\n")
-		return
+		return [2]int{0, 0}, err
 	}
 
 	if args[0] == args[1] {
 		err = fmt.Errorf("\nNumbers should not be equal.\n")
-		return
+		return [2]int{0, 0}, err
 	}
 
 	return
 }
 
-func fibonacci(num int) int {
-	if num <= 1 {
-		return num
-	}
+func fibonacci(num int) (fib int) {
 
-	return fibonacci(num-2) + fibonacci(num-1)
+	fib2 := 1
+
+	for i := 0; i < num; i++ {
+		temp := fib
+		fib = fib2
+		fib2 = temp + fib
+	}
+	return
 }
 
-func fibBorders(x int) (int, int) {
-	var i int
+func fibSlice(args [2]int) (fibSl []string) {
+	sort.Ints(args[:])
 
-	for fibonacci(i) < x {
-		i++
-		if fibonacci(i) == x {
-			return x, x
+	for i := 0; fibonacci(i) <= args[1]; i++ {
+		if fibonacci(i) >= args[0] {
+			fibSl = append(fibSl, strconv.Itoa(fibonacci(i)))
 		}
 	}
 
-	return fibonacci(i - 1), fibonacci(i)
-}
-
-func fibSlice(fibs [2]int) (fibSl []string) {
-	sort.Ints(fibs[:])
-	for i := 0; fibonacci(i) <= fibs[1]; i++ {
-		if fibonacci(i) >= fibs[0] {
-			fibSl = append(fibSl, strconv.Itoa(int(fibonacci(i))))
-		}
-	}
 	return
 }
 
 func main() {
 	var args [2]int
-	var err = errors.New("No inupts given.")
+	var err = errors.New("\nNo input.\n")
 
 	if len(os.Args) > 2 {
 		args, err = validArgs(os.Args[1:])

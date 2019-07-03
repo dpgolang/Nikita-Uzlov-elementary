@@ -1,7 +1,7 @@
 package main
 
 import (
-	"strings"
+	"fmt"
 	"testing"
 )
 
@@ -35,37 +35,14 @@ func TestFibonacci(t *testing.T) {
 	}
 }
 
-func TestFibBorders(t *testing.T) {
-	type wanted struct {
-		want1 int
-		want2 int
-	}
-	var tests = []struct {
-		input int
-		wanted
-	}{
-		{10, wanted{8, 13}},
-		{43, wanted{34, 55}},
-		{100, wanted{89, 144}},
-		{2000, wanted{1597, 2584}},
-	}
-	for _, test := range tests {
-		got1, got2 := fibBorders(test.input)
-		if got1 != test.want1 || got2 != test.want2 {
-			t.Errorf("fibBorders(%#v) = \"%v\", want \"%v\"", test.input, []int{got1, got2}, test.wanted)
-		}
-	}
-}
-
 func TestFibSlice(t *testing.T) {
 	var tests = []struct {
 		input [2]int
 		want  []string
 	}{
-		{[2]int{5, 34}, []string{"5", "8", "13", "21", "34"}},
+		{[2]int{5, 34},[]string{"5", "8", "13", "21", "34"}},
 		{[2]int{13, 89}, []string{"13", "21", "34", "55", "89"}},
-		{[2]int{144, 987}, []string{"144", "233", "377", "610", "987"}},
-		{[2]int{8, 987}, []string{"8", "13", "21", "34", "55", "89", "144", "233", "377", "610", "987"}},
+		{[2]int{144, 987},[]string{"144", "233", "377", "610", "987"}},
 	}
 	for _, test := range tests {
 		got := fibSlice(test.input)
@@ -76,23 +53,38 @@ func TestFibSlice(t *testing.T) {
 }
 
 func TestValidArgs(t *testing.T) {
-	var errTests = []struct {
-		input []string
-		want  string
-	}{
-		{[]string{"5", "8", "13", "21", "34"}, "Two inputs required, 5 entered."},
-		{[]string{"34"}, "Two inputs required, 1 entered."},
-		{[]string{"sfsf", "34"}, "First argument \"sfsf\" is not an integer number. "},
-		{[]string{"3", "sdfdf"}, "Second argument \"sdfdf\" is not an integer number."},
-		{[]string{"-2", "3"}, "\nArguments have to be positive.\n"},
-		{[]string{"2", "-3"}, "\nArguments have to be positive.\n"},
-		{[]string{"-2", "-3"}, "\nArguments have to be positive.\n"},
-		{[]string{"2", "2"}, "\nNumbers should not be equal.\n"},
+	type want struct {
+		res [2]int
+		err error
 	}
-	for _, errTest := range errTests {
-		_, err := validArgs(errTest.input)
-		if err == nil || !strings.Contains(err.Error(), errTest.want) {
-			t.Errorf("validateInputs(%#v) error = \"%v\", want \"%v\"", errTest.input, err, errTest.want)
+	var tests = []struct {
+		input []string
+		want
+	}{{[]string{"7", "15"},
+		want{[2]int{7, 15}, nil}},
+		{[]string{"5", "8", "13", "21", "34"},
+			want{[2]int{0, 0}, fmt.Errorf("\nTwo inputs required, %d entered.\n", 5)}},
+		{[]string{"34"},
+			want{[2]int{0, 0}, fmt.Errorf("\nTwo inputs required, %d entered.\n", 1)}},
+		{[]string{"sfsf", "34"},
+			want{[2]int{0, 0}, fmt.Errorf("\nFirst argument \"sfsf\" is not an integer number.\n")}},
+		{[]string{"34", "sdfdf"},
+			want{[2]int{0, 0}, fmt.Errorf("\nSecond argument \"sdfdf\" is not an integer number.\n")}},
+		{[]string{"-2", "3"},
+			want{[2]int{0, 0}, fmt.Errorf("\nArguments have to be positive.\n")}},
+		{[]string{"2", "-3"},
+			want{[2]int{0, 0}, fmt.Errorf("\nArguments have to be positive.\n")}},
+		{[]string{"-2", "-3"},
+			want{[2]int{0, 0}, fmt.Errorf("\nArguments have to be positive.\n")}},
+		{[]string{"2", "2"},
+			want{[2]int{0, 0}, fmt.Errorf("\nNumbers should not be equal.\n")}},
+	}
+	for _, test := range tests {
+		val, err := validArgs(test.input)
+		if err != nil && err.Error() != test.err.Error() || val != test.res {
+			t.Errorf("validArgs(%#v) = \"%v\" \"%v\", want \"%d\" \"%s\"\n", test.input, val, err.Error(), test.res, test.err.Error())
+		} else if err == nil && val != test.res {
+			t.Errorf("validArgs(%#v) value =  %d, want %d", test.input, val, test.res)
 		}
 	}
 }
